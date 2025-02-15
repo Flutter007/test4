@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:test4/model/book.dart';
 import 'package:test4/screens/books_screen.dart';
+import 'package:test4/widgets/book_form.dart';
 
 class Test4 extends StatefulWidget {
   const Test4({super.key});
@@ -28,11 +29,25 @@ class _Test4State extends State<Test4> {
     });
   }
 
+  void addBook(Book newBook) {
+    setState(() {
+      books.add(newBook);
+    });
+  }
+
   void editBook(Book editBook) {
     setState(() {
       final index = books.indexWhere((book) => book.id == editBook.id);
       books[index] = editBook;
     });
+  }
+
+  void openAddBookSheet() {
+    showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        builder: (ctx) => BookForm(onBookSaved: addBook));
   }
 
   @override
@@ -48,7 +63,7 @@ class _Test4State extends State<Test4> {
         ),
         actions: [
           IconButton(
-              onPressed: () {},
+              onPressed: openAddBookSheet,
               icon: Icon(
                 Icons.add,
                 size: 30,

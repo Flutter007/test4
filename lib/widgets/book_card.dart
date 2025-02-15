@@ -40,10 +40,12 @@ class BookCard extends StatelessWidget {
                 ],
               ),
               Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
                     'Status : ${status.status}',
-                    style: bodyLargeStyle,
+                    style:
+                        bodyLargeStyle.copyWith(backgroundColor: Colors.white),
                   ),
                 ],
               ),
