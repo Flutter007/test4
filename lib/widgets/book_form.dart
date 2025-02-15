@@ -19,8 +19,8 @@ class BookForm extends StatefulWidget {
 }
 
 class _BookFormState extends State<BookForm> {
-  var selectedDate = DateTime.now();
-  var selectedTime = TimeOfDay.now();
+  DateTime? selectedDate = DateTime.now();
+  TimeOfDay? selectedTime = TimeOfDay.now();
   final dateController = TextEditingController();
   final timeController = TextEditingController();
   final authorController = TextEditingController();
@@ -42,8 +42,8 @@ class _BookFormState extends State<BookForm> {
       selectedStatus = editedBook.statusID;
       ratingController.text = editedBook.rating.toString();
     }
-    dateController.text = formatDate(selectedDate);
-    timeController.text = formatTime(selectedTime);
+    dateController.text = formatDate(selectedDate!);
+    timeController.text = formatTime(selectedTime!);
   }
 
   @override
@@ -63,13 +63,23 @@ class _BookFormState extends State<BookForm> {
   }
 
   void onSave() {
-    final dateTime = DateTime(
-      selectedDate.year,
-      selectedDate.month,
-      selectedDate.day,
-      selectedTime.hour,
-      selectedTime.minute,
-    );
+    DateTime? dateTime;
+    if (selectedDate != null &&
+        selectedTime != null &&
+        selectedStatus == 'is_read') {
+      dateTime = DateTime(
+        selectedDate!.year,
+        selectedDate!.month,
+        selectedDate!.day,
+        selectedTime!.hour,
+        selectedTime!.minute,
+      );
+    } else {
+      dateTime = null;
+      selectedDate = null;
+      selectedTime = null;
+    }
+
     final addBook = Book(
       id: widget.editBook?.id,
       author: authorController.text.trim(),
@@ -105,7 +115,7 @@ class _BookFormState extends State<BookForm> {
   void onTimeTap() async {
     final userTime = await showTimePicker(
       context: context,
-      initialTime: selectedTime,
+      initialTime: selectedTime ?? TimeOfDay.now(),
     );
     if (userTime != null) {
       setState(() {
@@ -132,6 +142,7 @@ class _BookFormState extends State<BookForm> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+
     return SingleChildScrollView(
       child: Container(
         width: double.infinity,
@@ -166,9 +177,9 @@ class _BookFormState extends State<BookForm> {
               label: Text('Genre : '),
               inputDecorationTheme: theme.inputDecorationTheme,
               initialSelection: selectedGenre,
-              onSelected: ((value) => setState(
-                    () => value = selectedGenre,
-                  )),
+              onSelected: (value) => setState(
+                () => selectedGenre = value,
+              ),
               dropdownMenuEntries: genres
                   .map(
                     (genre) => DropdownMenuEntry(
@@ -199,9 +210,9 @@ class _BookFormState extends State<BookForm> {
               label: Text('Status : '),
               inputDecorationTheme: theme.inputDecorationTheme,
               initialSelection: selectedStatus,
-              onSelected: ((value) => setState(
-                    () => value = selectedStatus,
-                  )),
+              onSelected: (value) => setState(
+                () => selectedStatus = value,
+              ),
               dropdownMenuEntries: statuses
                   .map(
                     (status) => DropdownMenuEntry(
@@ -212,34 +223,38 @@ class _BookFormState extends State<BookForm> {
                   .toList(),
             ),
             SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: dateController,
-                    onTap: onDateTap,
-                    decoration: const InputDecoration(
-                      label: Text('Select Date'),
+            if (selectedStatus == 'is_read')
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: dateController,
+                      onTap: onDateTap,
+                      readOnly: true,
+                      decoration: const InputDecoration(
+                        label: Text('Select Date'),
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: TextField(
-                    controller: timeController,
-                    onTap: onTimeTap,
-                    decoration: const InputDecoration(
-                      label: Text('Select Time'),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: TextField(
+                      controller: timeController,
+                      onTap: onTimeTap,
+                      readOnly: true,
+                      decoration: const InputDecoration(
+                        label: Text('Select Time'),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
             SizedBox(height: 20),
-            RatingSystem(
-              selectRating: selectRating,
-              changeState: changeIsChanged,
-            ),
+            if (selectedStatus == 'is_read')
+              RatingSystem(
+                selectRating: selectRating,
+                changeState: changeIsChanged,
+              ),
             SizedBox(height: 14),
             Row(
               children: [

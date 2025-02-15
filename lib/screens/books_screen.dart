@@ -6,12 +6,17 @@ import 'package:test4/widgets/book_card.dart';
 class BooksScreen extends StatelessWidget {
   final List<Book> books;
   final void Function(String id) onBookDelete;
-  // final void Function(String id) onBookEdit;
+  final void Function(String id) onBookEdit;
+  final void Function(Book) openInfo;
+  final int counter;
+
   const BooksScreen({
     super.key,
     required this.books,
     required this.onBookDelete,
-    // required this.onBookEdit,
+    required this.onBookEdit,
+    required this.openInfo,
+    required this.counter,
   });
 
   @override
@@ -23,7 +28,7 @@ class BooksScreen extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'Прочитано 15 Из 100',
+            'Прочитано $counter Из 100',
             style: bodyLargeStyle.copyWith(
                 fontSize: 23,
                 fontWeight: FontWeight.bold,
@@ -47,16 +52,20 @@ class BooksScreen extends StatelessWidget {
                         padding: EdgeInsets.zero,
                       ),
                       SlidableAction(
-                        onPressed: (ctx) => () {}, //=> onBookEdit(book.id),
+                        onPressed: (ctx) => onBookEdit(book.id),
                         icon: Icons.edit,
-                        backgroundColor: theme.colorScheme.error.withAlpha(220),
-                        label: 'Delete',
+                        backgroundColor:
+                            theme.colorScheme.secondary.withAlpha(220),
+                        label: 'Edit',
                         borderRadius: BorderRadius.circular(15),
                         padding: EdgeInsets.zero,
                       ),
                     ],
                   ),
-                  child: BookCard(book: book),
+                  child: BookCard(
+                    book: book,
+                    openInfo: openInfo,
+                  ),
                 );
               },
               itemCount: books.length,

@@ -5,4 +5,5 @@ final statuses = [
   BookStatus(id: 'is_reading', status: 'Is reading'),
   BookStatus(id: 'is_read', status: 'Is read'),
   BookStatus(id: 'is_postponed', status: 'Is postponed'),
+  BookStatus(id: 'all_statuses', status: 'All Statuses'),
 ];

@@ -13,7 +13,7 @@ class Book {
   final String genreID;
   final int pages;
   final String statusID;
-  final DateTime endTime;
+  DateTime? endTime;
   final int rating;
 
   Book(
@@ -23,7 +23,7 @@ class Book {
       required this.genreID,
       required this.pages,
       required this.statusID,
-      required this.endTime,
+      this.endTime,
       required this.rating})
       : id = id ?? uuid.v4();
 
