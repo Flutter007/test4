@@ -14,18 +14,18 @@ class Book {
   final int pages;
   final String statusID;
   DateTime? endTime;
-  final int rating;
+  final int? rating;
 
-  Book(
-      {String? id,
-      required this.author,
-      required this.title,
-      required this.genreID,
-      required this.pages,
-      required this.statusID,
-      this.endTime,
-      required this.rating})
-      : id = id ?? uuid.v4();
+  Book({
+    String? id,
+    required this.author,
+    required this.title,
+    required this.genreID,
+    required this.pages,
+    required this.statusID,
+    this.endTime,
+    this.rating,
+  }) : id = id ?? uuid.v4();
 
   BookGenre get genre {
     return genres.firstWhere((genre) => genre.id == genreID);

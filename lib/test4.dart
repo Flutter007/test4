@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:test4/data/books_data.dart';
 import 'package:test4/data/status_data.dart';
 import 'package:test4/model/book.dart';
 import 'package:test4/screens/books_screen.dart';
@@ -14,23 +15,28 @@ class Test4 extends StatefulWidget {
 }
 
 class _Test4State extends State<Test4> {
-  List<Book> books = [
-    Book(
-        author: 'Лев Толстой',
-        title: 'Преступление и наказание',
-        genreID: 'science_fiction',
-        pages: 400,
-        statusID: 'is_reading',
-        endTime: null,
-        rating: 4),
-  ];
-  int counter = 0;
+  List<Book> books = [];
+  int? counter;
   String? selectedStatus = 'all_statuses';
+
+  @override
+  void initState() {
+    super.initState();
+    loadBook();
+  }
+
+  void loadBook() async {
+    final loadedBook = await loadBooks();
+    setState(() {
+      books = loadedBook;
+    });
+  }
 
   void deleteBook(String id) {
     setState(() {
       books.removeWhere((book) => book.id == id);
     });
+    saveBooks(books);
   }
 
   void onCancel() {
@@ -43,9 +49,10 @@ class _Test4State extends State<Test4> {
     setState(() {
       books.add(newBook);
       if (newBook.statusID == 'is_read') {
-        counter++;
+        counter = (counter ?? 0 + 1);
       }
     });
+    saveBooks(books);
   }
 
   void editBook(Book editBook) {
@@ -53,6 +60,7 @@ class _Test4State extends State<Test4> {
       final index = books.indexWhere((book) => book.id == editBook.id);
       books[index] = editBook;
     });
+    saveBooks(books);
   }
 
   void openInfoSheet(Book book) {
@@ -76,10 +84,11 @@ class _Test4State extends State<Test4> {
 
   void openAddBookSheet() {
     showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        useSafeArea: true,
-        builder: (ctx) => BookForm(onBookSaved: addBook));
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (ctx) => BookForm(onBookSaved: addBook),
+    );
   }
 
   void openEditBookSheet(String id) {
@@ -107,9 +116,9 @@ class _Test4State extends State<Test4> {
         return 1;
       }
 
-      if (a.statusID == 'postponed' && b.statusID != 'postponed') {
+      if (a.statusID == 'is_postponed' && b.statusID != 'is_postponed') {
         return -1;
-      } else if (b.statusID == 'postponed' && a.statusID != 'postponed') {
+      } else if (b.statusID == 'is_postponed' && a.statusID != 'is_postponed') {
         return 1;
       }
 
@@ -125,6 +134,7 @@ class _Test4State extends State<Test4> {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.yellow.shade400,
         title: Text(
           '100 Books a year!',
           style: GoogleFonts.alexandria(
@@ -133,10 +143,10 @@ class _Test4State extends State<Test4> {
         ),
         actions: [
           DropdownMenu(
-            width: 200,
+            width: 170,
             initialSelection: selectedStatus,
             label: Text('Status : '),
-            onSelected: ((value) => setState(() => selectedStatus == value)),
+            onSelected: ((value) => setState(() => selectedStatus = value)),
             dropdownMenuEntries: statuses
                 .map(
                   (status) =>

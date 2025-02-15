@@ -29,7 +29,9 @@ class BookInfo extends StatelessWidget {
                   ? formatDateTime(book.endTime!)
                   : 'No Time',
             ),
-            BookInfoText(txt: 'Rating', meaning: book.rating.toString()),
+            BookInfoText(
+                txt: 'Rating',
+                meaning: book.rating != null ? book.rating.toString() : 'None'),
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(

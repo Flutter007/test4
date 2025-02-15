@@ -29,6 +29,7 @@ class _BookFormState extends State<BookForm> {
   final ratingController = TextEditingController();
   String? selectedGenre;
   String? selectedStatus;
+  int? rating;
 
   @override
   void initState() {
@@ -42,8 +43,8 @@ class _BookFormState extends State<BookForm> {
       selectedStatus = editedBook.statusID;
       ratingController.text = editedBook.rating.toString();
     }
-    dateController.text = formatDate(selectedDate!);
-    timeController.text = formatTime(selectedTime!);
+    dateController.text = formatDate(selectedDate);
+    timeController.text = formatTime(selectedTime);
   }
 
   @override
@@ -64,9 +65,9 @@ class _BookFormState extends State<BookForm> {
 
   void onSave() {
     DateTime? dateTime;
-    if (selectedDate != null &&
-        selectedTime != null &&
-        selectedStatus == 'is_read') {
+    if (selectedStatus == 'is_read' &&
+        selectedDate != null &&
+        selectedTime != null) {
       dateTime = DateTime(
         selectedDate!.year,
         selectedDate!.month,
@@ -76,10 +77,13 @@ class _BookFormState extends State<BookForm> {
       );
     } else {
       dateTime = null;
-      selectedDate = null;
-      selectedTime = null;
     }
 
+    if (ratingController.text.isNotEmpty) {
+      rating = int.parse(ratingController.text);
+    } else {
+      rating = null;
+    }
     final addBook = Book(
       id: widget.editBook?.id,
       author: authorController.text.trim(),
@@ -88,10 +92,18 @@ class _BookFormState extends State<BookForm> {
       pages: int.parse(pagesController.text.trim()),
       statusID: selectedStatus!,
       endTime: dateTime,
-      rating: int.parse(ratingController.text),
+      rating: rating,
     );
     widget.onBookSaved(addBook);
     Navigator.pop(context);
+  }
+
+  bool isRightCompleted() {
+    return authorController.text.isNotEmpty &&
+        titleController.text.isNotEmpty &&
+        selectedGenre != null &&
+        pagesController.text.isNotEmpty &&
+        selectedStatus != null;
   }
 
   void onDateTap() async {
@@ -125,9 +137,13 @@ class _BookFormState extends State<BookForm> {
     }
   }
 
-  void selectRating(int rate) {
+  void selectRating(int? rate) {
     setState(() {
-      ratingController.text = rate.toString();
+      if (rate != 0) {
+        ratingController.text = rate.toString();
+      } else {
+        rate = null;
+      }
     });
   }
 
@@ -155,6 +171,7 @@ class _BookFormState extends State<BookForm> {
                 Expanded(
                   child: TextField(
                     controller: authorController,
+                    keyboardType: TextInputType.name,
                     decoration: const InputDecoration(
                       label: Text('Author'),
                     ),
@@ -214,6 +231,7 @@ class _BookFormState extends State<BookForm> {
                 () => selectedStatus = value,
               ),
               dropdownMenuEntries: statuses
+                  .where((status) => status.id != 'all_statuses')
                   .map(
                     (status) => DropdownMenuEntry(
                       value: status.id,
@@ -269,7 +287,7 @@ class _BookFormState extends State<BookForm> {
                 ),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: onSave,
+                    onPressed: isRightCompleted() ? onSave : null,
                     child: Text('Save'),
                   ),
                 )

@@ -8,7 +8,7 @@ class BooksScreen extends StatelessWidget {
   final void Function(String id) onBookDelete;
   final void Function(String id) onBookEdit;
   final void Function(Book) openInfo;
-  final int counter;
+  final int? counter;
 
   const BooksScreen({
     super.key,
@@ -23,17 +23,36 @@ class BooksScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bodyLargeStyle = theme.textTheme.bodyLarge!;
+
+    if (books.isEmpty) {
+      return Center(
+        child: Text(
+          'Список Пуст!',
+          style: bodyLargeStyle,
+        ),
+      );
+    }
     return Padding(
       padding: EdgeInsets.all(9),
       child: Column(
         children: [
-          Text(
-            'Прочитано $counter Из 100',
-            style: bodyLargeStyle.copyWith(
-                fontSize: 23,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87),
-          ),
+          (counter == 100)
+              ? Text(
+                  'Поздравляем,цель достигнута!',
+                  style: bodyLargeStyle.copyWith(
+                      fontSize: 23,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green),
+                )
+              : Text(
+                  counter == null
+                      ? 'Прочитано 0 Из 100'
+                      : 'Прочитано $counter Из 100',
+                  style: bodyLargeStyle.copyWith(
+                      fontSize: 23,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87),
+                ),
           SizedBox(height: 20),
           Expanded(
             child: ListView.builder(
