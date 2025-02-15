@@ -41,10 +41,20 @@ class _BookFormState extends State<BookForm> {
       pagesController.text = editedBook.pages.toString();
       selectedGenre = editedBook.genreID;
       selectedStatus = editedBook.statusID;
-      ratingController.text = editedBook.rating.toString();
+      ratingController.text =
+          editedBook.rating != null ? editedBook.rating.toString() : '';
+      if (editedBook.endTime != null) {
+        selectedDate = editedBook.endTime;
+        selectedTime = TimeOfDay.fromDateTime(editedBook.endTime!);
+        dateController.text = formatDate(selectedDate);
+        timeController.text = formatTime(selectedTime);
+      } else {
+        selectedDate = null;
+        selectedTime = null;
+        dateController.text = '';
+        timeController.text = '';
+      }
     }
-    dateController.text = formatDate(selectedDate);
-    timeController.text = formatTime(selectedTime);
   }
 
   @override
@@ -80,7 +90,7 @@ class _BookFormState extends State<BookForm> {
     }
 
     if (ratingController.text.isNotEmpty) {
-      rating = int.parse(ratingController.text);
+      rating = int.tryParse(ratingController.text);
     } else {
       rating = null;
     }
@@ -115,7 +125,7 @@ class _BookFormState extends State<BookForm> {
         context: context,
         firstDate: firstDate,
         lastDate: lastDate,
-        initialDate: selectedDate);
+        initialDate: selectedDate ?? DateTime.now());
     if (userDateTime != null) {
       setState(() {
         selectedDate = userDateTime;
